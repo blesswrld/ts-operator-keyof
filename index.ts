@@ -32,3 +32,7 @@ const google = {
 
 // Вызов функции
 printDebts(google, "name", "open");
+
+// Делаем запрос типа по ключам
+type GoogleKeys = keyof typeof google;
+const keys2: GoogleKeys = "name";
