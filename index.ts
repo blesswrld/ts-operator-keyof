@@ -1,65 +1,74 @@
-// Интерфейсы
-interface ICompany {
-    name: string;
-    debts: number;
-    departments: Department[];
-    managment: {
-        owner: string;
-    };
+interface IPhone {
+    company: string;
+    number: number;
 }
 
-interface Department {
-    // Фиксируем значение ключей
-    [key: string]: string;
+// IMobilePhone должен наследоваться от IPhone,
+// тип свойства companyPartner зависит от свойства company
+
+interface IMobilePhone extends IPhone {
+    size: string;
+    companyPartner: IPhone["company"];
+    manufactured: Date;
 }
 
-// const debts = "debts";
-// Убираем ошибку для глобальной переменной с помощью назначение литерального типа
-// let debts = "debts" as "debts";
-// Либо с помощью аннотации типа
-let debts: "debts" = "debts";
-// Делаем запрос через typeof к debts
-type CompanyDebtsType = ICompany[typeof debts];
+// Типизировать объект phones
 
-// Indexed access type (доступ по индексному ключу)
-// type CompanyDebtsType = ICompany["debts"];
-// Получаем тип владельца (вложенный объект)
-type CompanyOwnerType = ICompany["managment"]["owner"];
-//
-type CompanyDepartmentsType = ICompany["departments"][number];
-type CompanyDepartmentsTypes = ICompany["departments"];
-// Получаем Union-type со всеми свойствами объекта
-type Test = ICompany[keyof ICompany];
-
-// Тип с ключами
-type CompanyKeys = keyof ICompany;
-const keys: CompanyKeys = "name"; // Берем ключ name из интерфейса компании
-
-// Generic функция
-function printDebts<T, K extends keyof T, S extends keyof T>(
-    company: T,
-    name: K,
-    debts: S
-) {
-    console.log(`Company ${company[name]}, debts: ${company[debts]}`);
-}
-
-const google: ICompany = {
-    name: "Google",
-    debts: 500000,
-    departments: {
-        sales: "sales",
-        developer: "dev",
+const phones: IMobilePhone[] = [
+    {
+        company: "Nokia",
+        number: 1285637,
+        size: "5.5",
+        companyPartner: "MobileNokia",
+        manufactured: new Date("2022-09-01"),
     },
-
-    managment: {
-        owner: "John",
+    {
+        company: "Samsung",
+        number: 4356637,
+        size: "5.0",
+        companyPartner: "SamMobile",
+        manufactured: new Date("2021-11-05"),
     },
-};
+    {
+        company: "Apple",
+        number: 4552833,
+        size: "5.7",
+        companyPartner: "no data",
+        manufactured: new Date("2022-05-24T12:00:00"),
+    },
+];
 
-// Вызов функции
-printDebts(google, "name", "debts");
+interface IPhonesManufacturedAfterDate extends IMobilePhone {
+    initialDate: string;
+}
 
-// Делаем запрос типа по ключам
-type GoogleKeys = keyof typeof google;
-const keys2: GoogleKeys = "name";
+// Функция должна отфильтровать массив данных и вернуть новый массив
+// с телефонами, выпущенными после даты в третьем аргументе
+
+function filterPhonesByDate(
+    phones: IMobilePhone[],
+    // Получаем ключ Union-типа
+    key: keyof IMobilePhone,
+    initial: string
+): IPhonesManufacturedAfterDate[] {
+    return phones
+        .filter((phone) => {
+            const manufactured = phone[key];
+
+            if (
+                manufactured instanceof Date &&
+                manufactured.getTime() > new Date(initial).getTime()
+            ) {
+                return phone;
+            }
+        })
+        .map((phone) => {
+            const newObj = { ...phone, initialDate: initial };
+            return newObj;
+        });
+}
+
+// Второй аргумент при вызове функции должен быть связан с первым,
+// а значит мы получим подсказки - свойства этого объекта
+
+console.log(filterPhonesByDate(phones, "manufactured", "2022-01-01"));
