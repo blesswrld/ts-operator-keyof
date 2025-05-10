@@ -45,12 +45,12 @@ interface IPhonesManufacturedAfterDate extends IMobilePhone {
 // Функция должна отфильтровать массив данных и вернуть новый массив
 // с телефонами, выпущенными после даты в третьем аргументе
 
-function filterPhonesByDate(
-    phones: IMobilePhone[],
+function filterPhonesByDate<T extends IMobilePhone>(
+    phones: T[],
     // Получаем ключ Union-типа
-    key: keyof IMobilePhone,
+    key: keyof T,
     initial: string
-): IPhonesManufacturedAfterDate[] {
+): Partial<IPhonesManufacturedAfterDate>[] {
     return phones
         .filter((phone) => {
             const manufactured = phone[key];
@@ -72,3 +72,5 @@ function filterPhonesByDate(
 // а значит мы получим подсказки - свойства этого объекта
 
 console.log(filterPhonesByDate(phones, "manufactured", "2022-01-01"));
+
+// --- ЗАДАЧА ВЫПОЛНЕНА ---
